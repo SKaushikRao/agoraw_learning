@@ -1,0 +1,40 @@
+@import "tailwindcss";
+
+@theme {
+  --color-agora-bg: #F8F4EE;
+  --color-agora-card: #FFFDF9;
+  --color-agora-primary: #5C3B22;
+  --color-agora-dark: #3A2415;
+  --color-agora-accent: #B78B4A;
+  --color-agora-muted: #6E6A65;
+  --color-agora-border: #E6DDD2;
+  
+  --font-serif: "Playfair Display", "Cormorant Garamond", serif;
+  --font-sans: "Inter", "Source Sans Pro", sans-serif;
+}
+
+body {
+  background-color: var(--color-agora-bg);
+  color: var(--color-agora-dark);
+  font-family: var(--font-sans);
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-serif);
+}
+
+/* Custom Scrollbar for a premium feel */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-agora-bg);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-agora-border);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-agora-accent);
+}
+
