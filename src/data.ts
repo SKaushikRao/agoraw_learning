@@ -236,7 +236,7 @@ export const SUBJECTS_DATA: Record<string, SubjectData> = {
   philosophy: {
     id: "philosophy",
     name: "Philosophy",
-    subtitle: "Explore fundamental questions about existence, knowledge, ethics, values, and reality.",
+    subtitle: "Welcome to the Philosophy section. This section aims to introduce Philosophy for general audience as well as university students. In this section, we explore the diverse domains of philosophy that includes Axiology, Teleology, Metaphysics, Epistemology, Aesthetics, Logic, and many other branches. Users will find curated reading lists, videos, and articles for each domain to support their learning journey.",
     aboutText: "Welcome to the Philosophy section. This section aims to introduce Philosophy for general audience as well as university students. In this section, we explore the diverse domains of philosophy that includes Axiology, Teleology, Metaphysics, Epistemology, Aesthetics, Logic, and many other branches. Users will find curated reading lists, videos, and articles for each domain to support their learning journey.",
     stats: {
       paths: "12",
