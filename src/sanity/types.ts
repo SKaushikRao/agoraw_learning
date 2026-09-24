@@ -79,6 +79,9 @@ export interface SanityArticle {
   order?: number;
   isFeatured?: boolean;
   isVisible?: boolean;
+  submissionType?: 'editorial' | 'community';
+  submitterName?: string;
+  submitterEmail?: string;
   body?: any[];
   seo?: {
     seoTitle?: string;

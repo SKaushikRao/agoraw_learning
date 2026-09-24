@@ -1,7 +1,42 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { Link } from 'react-router-dom';
+import { Play, FileText } from 'lucide-react';
+import { sanityFetch } from '../sanity/client';
+import { GET_COMMUNITY_ARTICLES_QUERY } from '../sanity/queries';
+import { SanityArticle } from '../sanity/types';
+import { getSanityImageUrl } from '../sanity/image';
+import WriteArticleModal from '../components/WriteArticleModal';
 
 export default function Community() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [isWriteModalOpen, setIsWriteModalOpen] = useState(false);
+  const [articles, setArticles] = useState<SanityArticle[]>([]);
+  const [articlesLoading, setArticlesLoading] = useState(true);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const fetchArticles = async () => {
+      setArticlesLoading(true);
+      try {
+        const data = await sanityFetch<SanityArticle[]>(GET_COMMUNITY_ARTICLES_QUERY);
+        if (isMounted) {
+          setArticles(data || []);
+        }
+      } catch (err) {
+        console.error('Failed to fetch community articles:', err);
+        if (isMounted) setArticles([]);
+      } finally {
+        if (isMounted) setArticlesLoading(false);
+      }
+    };
+
+    fetchArticles();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -17,7 +52,7 @@ export default function Community() {
         canvas.width = canvas.parentElement.clientWidth;
         canvas.height = 400;
         width = canvas.width;
-        height = canvas.height;
+        height = 400;
       }
     };
     window.addEventListener('resize', resize);
@@ -35,8 +70,7 @@ export default function Community() {
 
     const draw = () => {
       ctx.clearRect(0, 0, width, height);
-      
-      // Draw map-like background points
+
       ctx.fillStyle = 'rgba(183, 139, 74, 0.05)';
       for(let i=0; i<100; i++) {
         ctx.beginPath();
@@ -91,8 +125,29 @@ export default function Community() {
     };
   }, []);
 
+  const refreshArticles = () => {
+    let isMounted = true;
+    sanityFetch<SanityArticle[]>(GET_COMMUNITY_ARTICLES_QUERY)
+      .then((data) => {
+        if (isMounted) setArticles(data || []);
+      })
+      .catch((err) => {
+        console.error('Failed to fetch community articles:', err);
+      });
+    
+    return () => {
+      isMounted = false;
+    };
+  };
+
   return (
     <div className="max-w-7xl mx-auto px-6 md:px-12 py-16">
+      <WriteArticleModal
+        isOpen={isWriteModalOpen}
+        onClose={() => setIsWriteModalOpen(false)}
+        onSubmitSuccess={refreshArticles}
+      />
+
       <h1 className="font-serif text-5xl text-agora-dark mb-4">Community</h1>
       <p className="text-agora-muted mb-12 max-w-2xl">Connect with a global network of thinkers, students, and educators.</p>
       
@@ -104,11 +159,16 @@ export default function Community() {
         <canvas ref={canvasRef} className="w-full h-[400px] bg-[#F8F4EE]" style={{ display: 'block' }}></canvas>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
         <div className="bg-agora-card p-6 rounded-xl border border-agora-border shadow-sm">
           <h3 className="font-serif text-2xl text-agora-dark mb-2">Write an Essay</h3>
           <p className="text-sm text-agora-muted mb-6">Share your perspective on arts, humanities, and society.</p>
-          <button className="bg-agora-primary text-agora-bg px-6 py-2.5 rounded-full text-xs font-medium hover:bg-agora-dark transition-colors">Start Writing</button>
+          <button
+            onClick={() => setIsWriteModalOpen(true)}
+            className="bg-agora-primary text-agora-bg px-6 py-2.5 rounded-full text-xs font-medium hover:bg-agora-dark transition-colors"
+          >
+            Start Writing
+          </button>
         </div>
         <div className="bg-agora-card p-6 rounded-xl border border-agora-border shadow-sm">
           <h3 className="font-serif text-2xl text-agora-dark mb-2">Discussion Forums</h3>
@@ -120,6 +180,91 @@ export default function Community() {
           <p className="text-sm text-agora-muted mb-6">Attend virtual seminars, reading clubs, and guest lectures.</p>
           <button className="border border-agora-primary text-agora-primary px-6 py-2.5 rounded-full text-xs font-medium hover:bg-agora-primary hover:text-agora-bg transition-colors">View Schedule</button>
         </div>
+      </div>
+
+      {/* Community Articles Section */}
+      <div className="mt-12">
+        <h2 className="font-serif text-3xl text-agora-dark mb-8">From the Community</h2>
+
+        {articlesLoading ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {Array.from({ length: 6 }).map((_, idx) => (
+              <div key={idx} className="bg-slate-200 animate-pulse rounded-xl h-64"></div>
+            ))}
+          </div>
+        ) : articles.length > 0 ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {articles.map((article) => {
+              const articleSlug = article.slug?.current || article._id;
+              const imageUrl = getSanityImageUrl(article.coverImage, { width: 400, height: 260 });
+
+              return (
+                <Link
+                  to={`/article/${articleSlug}`}
+                  key={article._id}
+                  className="bg-white rounded-xl overflow-hidden border border-agora-border hover:shadow-md transition-shadow group flex flex-col"
+                >
+                  <div className="relative h-36 w-full overflow-hidden bg-slate-100">
+                    {imageUrl ? (
+                      <img
+                        src={imageUrl}
+                        alt={article.title}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      />
+                    ) : (
+                      <div className="w-full h-full bg-[#EAE3D5] flex items-center justify-center text-agora-primary font-serif font-bold text-xl">
+                        Agora
+                      </div>
+                    )}
+                    <span className="absolute top-2 left-2 text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded backdrop-blur-md bg-black/60 text-white flex items-center gap-1">
+                      {article.type === 'video' ? <Play size={10} className="fill-current" /> : <FileText size={10} />}
+                      {article.type || 'Article'}
+                    </span>
+                    {article.readTime && (
+                      <span className="absolute bottom-2 right-2 text-[9px] bg-black/70 text-white px-1.5 py-0.5 rounded font-mono">
+                        {article.readTime}
+                      </span>
+                    )}
+                  </div>
+
+                  <div className="p-4 flex-1 flex flex-col justify-between">
+                    <div>
+                      <h3 className="font-serif text-sm font-bold leading-tight text-agora-dark group-hover:text-agora-primary transition-colors line-clamp-2 mb-2">
+                        {article.title}
+                      </h3>
+                      <p className="text-[10px] text-slate-400 line-clamp-1 mb-2">
+                        By {article.submitterName || article.author?.name || 'Community Contributor'}
+                      </p>
+                    </div>
+
+                    {article.tags && article.tags.length > 0 && (
+                      <div className="flex flex-wrap gap-1 mt-2 pt-2 border-t border-slate-100">
+                        {article.tags.slice(0, 3).map((tag: string) => (
+                          <span
+                            key={tag}
+                            className="text-[8px] font-semibold tracking-wider uppercase px-1.5 py-0.5 rounded bg-slate-50 text-slate-500"
+                          >
+                            {tag}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </Link>
+              );
+            })}
+          </div>
+        ) : (
+          <div className="text-center py-16 border border-dashed border-agora-border rounded-2xl">
+            <p className="text-agora-muted">No community essays yet. Be the first to share your perspective!</p>
+            <button
+              onClick={() => setIsWriteModalOpen(true)}
+              className="mt-4 bg-agora-primary text-agora-bg px-6 py-2.5 rounded-full text-xs font-medium hover:bg-agora-dark transition-colors"
+            >
+              Start Writing
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

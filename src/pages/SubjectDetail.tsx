@@ -2,8 +2,8 @@ import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Play, FileText, ArrowRight, Brain, Landmark, BookOpen, TrendingUp, HelpCircle } from 'lucide-react';
 import { sanityFetch } from '../sanity/client';
-import { GET_SUBJECT_BY_SLUG_QUERY } from '../sanity/queries';
-import { SanitySubject } from '../sanity/types';
+import { GET_SUBJECT_BY_SLUG_QUERY, GET_ARTICLES_BY_SUBJECT_QUERY } from '../sanity/queries';
+import { SanitySubject, SanityArticle } from '../sanity/types';
 import { getSanityImageUrl } from '../sanity/image';
 import EmptyState from '../components/EmptyState';
 import { PageLoading } from '../components/LoadingSkeleton';
@@ -90,6 +90,7 @@ function renderSubjectHeroIcon(iconType?: string) {
 export default function SubjectDetail() {
   const { id = '' } = useParams<{ id: string }>();
   const [subject, setSubject] = useState<SanitySubject | null>(null);
+  const [articles, setArticles] = useState<SanityArticle[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeStep, setActiveStep] = useState<number>(1);
 
@@ -97,12 +98,16 @@ export default function SubjectDetail() {
     let isMounted = true;
     setLoading(true);
 
-    sanityFetch<SanitySubject>(GET_SUBJECT_BY_SLUG_QUERY, { slug: id })
-      .then((data) => {
+    Promise.all([
+      sanityFetch<SanitySubject>(GET_SUBJECT_BY_SLUG_QUERY, { slug: id }),
+      sanityFetch<SanityArticle[]>(GET_ARTICLES_BY_SUBJECT_QUERY, { slug: id })
+    ])
+      .then(([subjectData, articlesData]) => {
         if (isMounted) {
-          setSubject(data);
-          if (data?.learningSteps && data.learningSteps.length > 0) {
-            setActiveStep(data.learningSteps[0].stepNumber || 1);
+          setSubject(subjectData);
+          setArticles(articlesData || []);
+          if (subjectData?.learningSteps && subjectData.learningSteps.length > 0) {
+            setActiveStep(subjectData.learningSteps[0].stepNumber || 1);
           }
           setLoading(false);
         }
@@ -350,6 +355,81 @@ export default function SubjectDetail() {
             ) : (
               <div className="bg-[#FFFDF9] p-8 rounded-2xl border border-agora-border text-center text-agora-muted text-sm">
                 No learning path steps configured for this subject yet.
+              </div>
+            )}
+
+            {/* All Articles in this Subject */}
+            {articles.length > 0 && (
+              <div className="space-y-6">
+                <div className="flex items-center justify-between">
+                  <h3 className={`font-serif text-xl font-bold ${themeClass.textDark}`}>
+                    All Articles in {subject.title}
+                  </h3>
+                  <Link
+                    to={`/articles?subject=${encodeURIComponent(subject.slug?.current || '')}`}
+                    className={`text-sm font-semibold ${themeClass.primaryText} hover:underline flex items-center gap-1`}
+                  >
+                    View All <ArrowRight size={14} />
+                  </Link>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {articles.map((article) => {
+                    const articleSlug = article.slug?.current || article._id;
+                    const imageUrl = getSanityImageUrl(article.coverImage, { width: 400, height: 260 });
+
+                    return (
+                      <Link
+                        to={`/article/${articleSlug}`}
+                        key={article._id}
+                        className={`${themeClass.cardBg} rounded-xl overflow-hidden border ${themeClass.border} hover:shadow-md transition-shadow group flex flex-col`}
+                      >
+                        <div className="relative h-40 w-full overflow-hidden bg-slate-100">
+                          {imageUrl ? (
+                            <img 
+                              src={imageUrl} 
+                              alt={article.title}
+                              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
+                            />
+                          ) : (
+                            <div className="w-full h-full bg-[#EAE3D5] flex items-center justify-center text-agora-primary font-serif font-bold text-xl">
+                              Agora
+                            </div>
+                          )}
+                          <span className={`absolute top-2 left-2 text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded backdrop-blur-md bg-black/60 text-white flex items-center gap-1`}>
+                            {article.type === 'video' ? <Play size={10} className="fill-current" /> : <FileText size={10} />}
+                            {article.type || 'Article'}
+                          </span>
+                          {article.readTime && (
+                            <span className="absolute bottom-2 right-2 text-[9px] bg-black/70 text-white px-1.5 py-0.5 rounded font-mono">
+                              {article.readTime}
+                            </span>
+                          )}
+                        </div>
+
+                        <div className="p-4 flex-1 flex flex-col justify-between">
+                          <div>
+                            <h4 className={`font-serif text-sm font-bold leading-tight ${themeClass.textDark} group-hover:${themeClass.primaryText} transition-colors line-clamp-2 mb-2`}>
+                              {article.title}
+                            </h4>
+                            <p className="text-[10px] text-slate-400 line-clamp-1 mb-2">
+                              By {article.author?.name || 'Agora Faculty'}
+                            </p>
+                          </div>
+                          
+                          {article.tags && article.tags.length > 0 && (
+                            <div className="flex flex-wrap gap-1 mt-2 pt-2 border-t border-slate-100">
+                              {article.tags.slice(0, 3).map((tag: string) => (
+                                <span key={tag} className={`text-[8px] font-semibold tracking-wider uppercase px-1.5 py-0.5 rounded bg-slate-50 text-slate-500`}>
+                                  {tag}
+                                </span>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      </Link>
+                    );
+                  })}
+                </div>
               </div>
             )}
 

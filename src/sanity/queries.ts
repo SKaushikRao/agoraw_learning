@@ -310,6 +310,12 @@ export const GET_ARTICLES_QUERY = `
 }
 `;
 
+export const GET_COMMUNITY_ARTICLES_QUERY = `
+*[_type == "article" && isVisible != false && submissionType == "community"] | order(publishedAt desc) {
+  ${ARTICLE_CARD_FRAGMENT}
+}
+`;
+
 export const GET_ARTICLE_BY_SLUG_QUERY = `
 *[_type == "article" && slug.current == $slug && isVisible != false][0] {
   _id,
@@ -369,6 +375,12 @@ export const GET_RESOURCES_QUERY = `
 export const GET_EVENTS_QUERY = `
 *[_type == "event" && isVisible != false] | order(order asc) {
   ${EVENT_FRAGMENT}
+}
+`;
+
+export const GET_ARTICLES_BY_SUBJECT_QUERY = `
+*[_type == "article" && isVisible != false && subject->slug.current == $slug] | order(order asc, publishedAt desc) {
+  ${ARTICLE_CARD_FRAGMENT}
 }
 `;
 
