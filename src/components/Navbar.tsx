@@ -1,15 +1,19 @@
-import { Search, Bookmark, User, Moon, LogIn } from 'lucide-react';
-import { Link, NavLink, useLocation } from 'react-router-dom';
+import React, { useState } from 'react';
+import { Search, Bookmark, User, Moon, LogIn, X } from 'lucide-react';
+import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
 
 export default function Navbar() {
   const location = useLocation();
+  const navigate = useNavigate();
   const path = location.pathname;
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [navSearch, setNavSearch] = useState('');
 
-  const isSpaceCadet = path === '/subject/psychology' || path === '/subject/philosophy';
-  const isWarmBrown = path === '/subject/liberal-arts' || path === '/subject/economics';
+  const isSubjectPage = path.startsWith('/subject/');
+  const isArticlePage = path.startsWith('/article/');
 
   // Dynamic theme styling
-  const navStyles = isSpaceCadet 
+  const navStyles = isSubjectPage 
     ? {
         navClass: 'bg-[#25344F] border-b border-[#2F4162] text-white',
         logoCircle: 'bg-white text-[#25344F]',
@@ -17,17 +21,7 @@ export default function Navbar() {
         links: 'text-[#C5D1E6] hover:text-white',
         activeLink: 'text-white border-b-2 border-white pb-1 font-bold',
         buttonClass: 'bg-white text-[#25344F] hover:bg-slate-100',
-        iconHover: 'hover:bg-white/10'
-      }
-    : isWarmBrown
-    ? {
-        navClass: 'bg-[#5C3B22] border-b border-[#754E31] text-white',
-        logoCircle: 'bg-[#FFFDF9] text-[#5C3B22]',
-        logoText: 'text-white',
-        links: 'text-[#DFD0C0] hover:text-white',
-        activeLink: 'text-white border-b-2 border-white pb-1 font-bold',
-        buttonClass: 'bg-[#FFFDF9] text-[#5C3B22] hover:bg-slate-100',
-        iconHover: 'hover:bg-white/10'
+        iconHover: 'hover:bg-white/10 text-white'
       }
     : {
         navClass: 'bg-agora-bg/90 border-b border-agora-border text-agora-dark',
@@ -36,8 +30,17 @@ export default function Navbar() {
         links: 'text-agora-muted hover:text-agora-accent',
         activeLink: 'text-agora-primary font-bold',
         buttonClass: 'bg-agora-primary text-agora-bg hover:bg-agora-dark',
-        iconHover: 'hover:bg-agora-border/50'
+        iconHover: 'hover:bg-agora-border/50 text-agora-dark'
       };
+
+  const handleNavSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (navSearch.trim()) {
+      navigate(`/articles?q=${encodeURIComponent(navSearch.trim())}`);
+      setIsSearchOpen(false);
+      setNavSearch('');
+    }
+  };
 
   return (
     <nav className={`sticky top-0 z-50 backdrop-blur-md py-4 px-6 md:px-12 flex items-center justify-between transition-colors duration-300 ${navStyles.navClass}`}>
@@ -87,20 +90,58 @@ export default function Navbar() {
         </NavLink>
       </div>
 
-      <div className="flex items-center gap-4">
-        <button className={`p-2 rounded-full transition-colors ${navStyles.iconHover}`}>
-          <Search size={20} />
-        </button>
-        <button className={`hidden md:block p-2 rounded-full transition-colors ${navStyles.iconHover}`}>
+      <div className="flex items-center gap-3">
+        {isSearchOpen ? (
+          <form onSubmit={handleNavSearch} className="relative flex items-center">
+            <input
+              type="text"
+              value={navSearch}
+              onChange={(e) => setNavSearch(e.target.value)}
+              placeholder="Search..."
+              autoFocus
+              className="bg-white/10 border border-white/20 rounded-full pl-3 pr-8 py-1.5 text-xs text-inherit placeholder:opacity-60 focus:outline-none"
+            />
+            <button
+              type="button"
+              onClick={() => setIsSearchOpen(false)}
+              className="absolute right-2 text-inherit opacity-70 hover:opacity-100"
+            >
+              <X size={14} />
+            </button>
+          </form>
+        ) : (
+          <button 
+            onClick={() => setIsSearchOpen(true)} 
+            className={`p-2 rounded-full transition-colors ${navStyles.iconHover}`}
+            title="Search"
+          >
+            <Search size={20} />
+          </button>
+        )}
+
+        <button 
+          onClick={() => alert('Saved bookmarks feature is enabled in Agora.')}
+          className={`hidden md:block p-2 rounded-full transition-colors ${navStyles.iconHover}`}
+          title="Bookmarks"
+        >
           <Bookmark size={20} />
         </button>
-        <button className={`hidden md:block p-2 rounded-full transition-colors ${navStyles.iconHover}`}>
+        <button 
+          className={`hidden md:block p-2 rounded-full transition-colors ${navStyles.iconHover}`}
+          title="Toggle Theme"
+        >
           <Moon size={20} />
         </button>
-        <button className={`hidden md:block p-2 rounded-full transition-colors ${navStyles.iconHover}`}>
+        <button 
+          className={`hidden md:block p-2 rounded-full transition-colors ${navStyles.iconHover}`}
+          title="Account"
+        >
           <User size={20} />
         </button>
-        <button className={`flex items-center gap-2 px-4 py-2 rounded-full font-medium transition-colors ${navStyles.buttonClass}`}>
+        <button 
+          onClick={() => alert('Agora authentication dialog')}
+          className={`flex items-center gap-2 px-4 py-2 rounded-full font-medium transition-colors ${navStyles.buttonClass}`}
+        >
           <span className="hidden sm:inline">Sign In</span>
           <LogIn size={18} className="sm:hidden" />
         </button>

@@ -5,6 +5,7 @@ import Subjects from './pages/Subjects';
 import SubjectDetail from './pages/SubjectDetail';
 import LearningPaths from './pages/LearningPaths';
 import Articles from './pages/Articles';
+import ArticleDetail from './pages/ArticleDetail';
 import Community from './pages/Community';
 import About from './pages/About';
 
@@ -18,6 +19,8 @@ export default function App() {
           <Route path="subject/:id" element={<SubjectDetail />} />
           <Route path="learning-paths" element={<LearningPaths />} />
           <Route path="articles" element={<Articles />} />
+          <Route path="article/:slug" element={<ArticleDetail />} />
+          <Route path="articles/:slug" element={<ArticleDetail />} />
           <Route path="community" element={<Community />} />
           <Route path="about" element={<About />} />
         </Route>
@@ -25,4 +28,3 @@ export default function App() {
     </Router>
   );
 }
-
