@@ -215,8 +215,13 @@ export default function Community() {
                       {article.type === 'video' ? <Play size={10} className="fill-current" /> : <FileText size={10} />}
                       {article.type || 'Article'}
                     </span>
+                    {article.status === 'pending' && (
+                      <span className="absolute top-2 right-2 text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-yellow-500/90 text-white backdrop-blur-sm">
+                        Pending
+                      </span>
+                    )}
                     {article.readTime && (
-                      <span className="absolute bottom-2 right-2 text-[9px] bg-black/70 text-white px-1.5 py-0.5 rounded font-mono">
+                      <span className={`absolute bottom-2 ${article.status === 'pending' ? 'left-2' : 'right-2'} text-[9px] bg-black/70 text-white px-1.5 py-0.5 rounded font-mono`}>
                         {article.readTime}
                       </span>
                     )}

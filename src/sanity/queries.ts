@@ -47,11 +47,38 @@ export const ARTICLE_CARD_FRAGMENT = `
   order,
   isFeatured,
   isVisible,
+  status,
   submissionType,
   submitterName,
   author-> {
     ${AUTHOR_FRAGMENT}
   },
+  subject-> {
+    _id,
+    title,
+    slug
+  },
+  categories[]-> {
+    ${CATEGORY_FRAGMENT}
+  },
+  tags,
+  coverImage {
+    ${IMAGE_FRAGMENT}
+  }
+`;
+
+export const COMMUNITY_SUBMISSION_FRAGMENT = `
+  _id,
+  _type,
+  title,
+  slug,
+  summary,
+  type,
+  readTime,
+  publishedAt,
+  status,
+  submitterName,
+  submitterEmail,
   subject-> {
     _id,
     title,
@@ -163,7 +190,7 @@ export const GET_HOMEPAGE_QUERY = `
       ${IMAGE_FRAGMENT}
     }
   },
-  "fallbackArticles": *[_type == "article" && isVisible != false] | order(order asc, publishedAt desc)[0...5]{
+  "fallbackArticles": *[_type == "article" && status == "approved"] | order(order asc, publishedAt desc)[0...5]{
     ${ARTICLE_CARD_FRAGMENT}
   },
   "fallbackEvents": *[_type == "event" && isVisible != false] | order(order asc)[0...5]{
@@ -308,20 +335,69 @@ export const GET_LEARNING_PATH_BY_SLUG_QUERY = `
 `;
 
 export const GET_ARTICLES_QUERY = `
-*[_type == "article" && isVisible != false] | order(order asc, publishedAt desc) {
+*[_type == "article" && status == "approved"] | order(order asc, publishedAt desc) {
   ${ARTICLE_CARD_FRAGMENT}
 }
 `;
 
 export const GET_COMMUNITY_ARTICLES_QUERY = `
-*[_type == "article" && submissionType == "community"] | order(publishedAt desc) {
-  ${ARTICLE_CARD_FRAGMENT}
+*[_type == "communitySubmission" && status == "approved"] | order(publishedAt desc) {
+  ${COMMUNITY_SUBMISSION_FRAGMENT}
 }
 `;
 
 export const GET_PENDING_ARTICLES_QUERY = `
-*[_type == "article" && isVisible == false] | order(publishedAt desc) {
-  ${ARTICLE_CARD_FRAGMENT}
+*[_type == "communitySubmission" && status == "pending"] | order(publishedAt desc) {
+  ${COMMUNITY_SUBMISSION_FRAGMENT}
+}
+`;
+
+export const GET_ALL_COMMUNITY_SUBMISSIONS_QUERY = `
+*[_type == "communitySubmission"] | order(publishedAt desc) {
+  ${COMMUNITY_SUBMISSION_FRAGMENT}
+}
+`;
+
+export const GET_COMMUNITY_SUBMISSION_BY_SLUG_QUERY = `
+*[_type == "communitySubmission" && slug.current == $slug][0] {
+  _id,
+  title,
+  slug,
+  summary,
+  type,
+  videoUrl,
+  readTime,
+  publishedAt,
+  status,
+  submitterName,
+  submitterEmail,
+  subject-> {
+    _id,
+    title,
+    slug
+  },
+  categories[]-> {
+    ${CATEGORY_FRAGMENT}
+  },
+  tags,
+  coverImage {
+    ${IMAGE_FRAGMENT}
+  },
+  body[] {
+    ...,
+    _type == "pteImage" => {
+      ...,
+      image {
+        ${IMAGE_FRAGMENT}
+      }
+    },
+    _type == "quote" => {
+      ...,
+      image {
+        ${IMAGE_FRAGMENT}
+      }
+    }
+  }
 }
 `;
 
@@ -391,14 +467,14 @@ export const GET_EVENTS_QUERY = `
 `;
 
 export const GET_ARTICLES_BY_SUBJECT_QUERY = `
-*[_type == "article" && isVisible != false && subject->slug.current == $slug] | order(order asc, publishedAt desc) {
+*[_type == "article" && status == "approved" && subject->slug.current == $slug] | order(order asc, publishedAt desc) {
   ${ARTICLE_CARD_FRAGMENT}
 }
 `;
 
 export const GET_SEARCH_QUERY = `
 {
-  "articles": *[_type == "article" && isVisible != false && (title match $query || summary match $query || tags[] match $query)][0...10] {
+  "articles": *[_type == "article" && status == "approved" && (title match $query || summary match $query || tags[] match $query)][0...10] {
     ${ARTICLE_CARD_FRAGMENT}
   },
   "subjects": *[_type == "subject" && isVisible != false && (title match $query || subtitle match $query || aboutText match $query)][0...5] {

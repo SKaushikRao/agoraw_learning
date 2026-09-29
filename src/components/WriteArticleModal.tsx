@@ -32,7 +32,7 @@ export default function WriteArticleModal({ isOpen, onClose, onSubmitSuccess }: 
 
     try {
       await sanityCreate({
-        _type: 'article',
+        _type: 'communitySubmission',
         title: title.trim(),
         slug: { _type: 'slug', current: slug },
         summary: content.trim().slice(0, 200) + (content.trim().length > 200 ? '...' : ''),
@@ -53,16 +53,12 @@ export default function WriteArticleModal({ isOpen, onClose, onSubmitSuccess }: 
             ],
           },
         ],
-        author: undefined,
         subject: undefined,
         categories: [],
         tags: ['community-submission'],
         readTime: `${Math.max(1, Math.ceil(content.trim().split(' ').length / 200))} min read`,
         publishedAt: new Date().toISOString(),
-        order: 999,
-        isFeatured: false,
-        isVisible: false,
-        submissionType: 'community',
+        status: 'pending',
         submitterName: authorName.trim(),
         submitterEmail: email.trim(),
       });

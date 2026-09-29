@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Clock, Calendar, Bookmark, Share2, ArrowLeft, User, BookOpen, Tag } from 'lucide-react';
 import { sanityFetch } from '../sanity/client';
-import { GET_ARTICLE_BY_SLUG_QUERY, GET_ARTICLES_QUERY } from '../sanity/queries';
+import { GET_ARTICLE_BY_SLUG_QUERY, GET_COMMUNITY_SUBMISSION_BY_SLUG_QUERY, GET_ARTICLES_QUERY } from '../sanity/queries';
 import { SanityArticle } from '../sanity/types';
 import { getSanityImageUrl } from '../sanity/image';
 import PortableTextRenderer from '../sanity/portableText';
@@ -19,10 +19,14 @@ export default function ArticleDetail() {
     let isMounted = true;
     setLoading(true);
 
-    sanityFetch<SanityArticle>(GET_ARTICLE_BY_SLUG_QUERY, { slug })
-      .then((data) => {
+    // Try to fetch from articles first, then community submissions
+    Promise.all([
+      sanityFetch<SanityArticle>(GET_ARTICLE_BY_SLUG_QUERY, { slug }),
+      sanityFetch<SanityArticle>(GET_COMMUNITY_SUBMISSION_BY_SLUG_QUERY, { slug })
+    ])
+      .then(([articleData, communityData]) => {
         if (isMounted) {
-          setArticle(data);
+          setArticle(articleData || communityData);
           setLoading(false);
         }
       })
@@ -71,7 +75,7 @@ export default function ArticleDetail() {
     : null;
 
   // Handle community submissions vs editorial articles
-  const isCommunitySubmission = article.submissionType === 'community';
+  const isCommunitySubmission = article._type === 'communitySubmission' || article.submissionType === 'community';
   const displayName = isCommunitySubmission ? article.submitterName : article.author?.name;
   const displayRole = isCommunitySubmission ? 'Community Contributor' : article.author?.role;
   const displayOrganization = isCommunitySubmission ? null : article.author?.organization;
