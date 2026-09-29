@@ -46,6 +46,9 @@ export const ARTICLE_CARD_FRAGMENT = `
   publishedAt,
   order,
   isFeatured,
+  isVisible,
+  submissionType,
+  submitterName,
   author-> {
     ${AUTHOR_FRAGMENT}
   },
@@ -311,13 +314,19 @@ export const GET_ARTICLES_QUERY = `
 `;
 
 export const GET_COMMUNITY_ARTICLES_QUERY = `
-*[_type == "article" && isVisible != false && submissionType == "community"] | order(publishedAt desc) {
+*[_type == "article" && submissionType == "community"] | order(publishedAt desc) {
+  ${ARTICLE_CARD_FRAGMENT}
+}
+`;
+
+export const GET_PENDING_ARTICLES_QUERY = `
+*[_type == "article" && isVisible == false] | order(publishedAt desc) {
   ${ARTICLE_CARD_FRAGMENT}
 }
 `;
 
 export const GET_ARTICLE_BY_SLUG_QUERY = `
-*[_type == "article" && slug.current == $slug && isVisible != false][0] {
+*[_type == "article" && slug.current == $slug][0] {
   _id,
   title,
   slug,
@@ -326,6 +335,9 @@ export const GET_ARTICLE_BY_SLUG_QUERY = `
   videoUrl,
   readTime,
   publishedAt,
+  isVisible,
+  submissionType,
+  submitterName,
   author-> {
     ${AUTHOR_FRAGMENT}
   },

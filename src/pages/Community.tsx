@@ -159,7 +159,7 @@ export default function Community() {
         <canvas ref={canvasRef} className="w-full h-[400px] bg-[#F8F4EE]" style={{ display: 'block' }}></canvas>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16">
         <div className="bg-agora-card p-6 rounded-xl border border-agora-border shadow-sm">
           <h3 className="font-serif text-2xl text-agora-dark mb-2">Write an Essay</h3>
           <p className="text-sm text-agora-muted mb-6">Share your perspective on arts, humanities, and society.</p>
@@ -169,11 +169,6 @@ export default function Community() {
           >
             Start Writing
           </button>
-        </div>
-        <div className="bg-agora-card p-6 rounded-xl border border-agora-border shadow-sm">
-          <h3 className="font-serif text-2xl text-agora-dark mb-2">Discussion Forums</h3>
-          <p className="text-sm text-agora-muted mb-6">Engage in intellectual debates and nuanced conversations.</p>
-          <button className="border border-agora-primary text-agora-primary px-6 py-2.5 rounded-full text-xs font-medium hover:bg-agora-primary hover:text-agora-bg transition-colors">Join Discussions</button>
         </div>
         <div className="bg-agora-card p-6 rounded-xl border border-agora-border shadow-sm">
           <h3 className="font-serif text-2xl text-agora-dark mb-2">Upcoming Events</h3>

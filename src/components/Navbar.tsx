@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Search, Bookmark, User, Moon, LogIn, X } from 'lucide-react';
+import { Search, Bookmark, Moon, X } from 'lucide-react';
 import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
 
 export default function Navbar() {
@@ -131,19 +131,6 @@ export default function Navbar() {
           title="Toggle Theme"
         >
           <Moon size={20} />
-        </button>
-        <button 
-          className={`hidden md:block p-2 rounded-full transition-colors ${navStyles.iconHover}`}
-          title="Account"
-        >
-          <User size={20} />
-        </button>
-        <button 
-          onClick={() => alert('Agora authentication dialog')}
-          className={`flex items-center gap-2 px-4 py-2 rounded-full font-medium transition-colors ${navStyles.buttonClass}`}
-        >
-          <span className="hidden sm:inline">Sign In</span>
-          <LogIn size={18} className="sm:hidden" />
         </button>
       </div>
     </nav>

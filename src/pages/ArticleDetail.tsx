@@ -70,6 +70,12 @@ export default function ArticleDetail() {
       })
     : null;
 
+  // Handle community submissions vs editorial articles
+  const isCommunitySubmission = article.submissionType === 'community';
+  const displayName = isCommunitySubmission ? article.submitterName : article.author?.name;
+  const displayRole = isCommunitySubmission ? 'Community Contributor' : article.author?.role;
+  const displayOrganization = isCommunitySubmission ? null : article.author?.organization;
+
   return (
     <article className="min-h-screen bg-[#F8F4EE] text-agora-dark py-12">
       <div className="max-w-4xl mx-auto px-6 md:px-12">
@@ -118,21 +124,21 @@ export default function ArticleDetail() {
           {/* Author & Meta Row */}
           <div className="flex flex-wrap items-center justify-between gap-4 pt-6 border-t border-b border-agora-border py-4">
             <div className="flex items-center gap-3">
-              {authorAvatar ? (
+              {!isCommunitySubmission && authorAvatar ? (
                 <div className="w-12 h-12 rounded-full overflow-hidden border border-agora-border bg-white shrink-0">
-                  <img src={authorAvatar} alt={article.author?.name || 'Author'} className="w-full h-full object-cover" />
+                  <img src={authorAvatar} alt={displayName || 'Author'} className="w-full h-full object-cover" />
                 </div>
               ) : (
                 <div className="w-12 h-12 rounded-full bg-[#EAE3D5] text-agora-primary flex items-center justify-center font-serif font-bold text-lg shrink-0">
-                  {article.author?.name?.[0] || 'A'}
+                  {displayName?.[0] || 'A'}
                 </div>
               )}
               <div>
                 <h4 className="text-sm font-bold text-agora-dark">
-                  {article.author?.name || 'Agora Contributor'}
+                  {displayName || 'Agora Contributor'}
                 </h4>
                 <p className="text-[11px] text-agora-muted">
-                  {[article.author?.role, article.author?.organization].filter(Boolean).join(' • ') || 'Academic Scholar'}
+                  {[displayRole, displayOrganization].filter(Boolean).join(' • ') || 'Academic Scholar'}
                 </p>
               </div>
             </div>
@@ -217,20 +223,20 @@ export default function ArticleDetail() {
           )}
         </div>
 
-        {/* Author Bio Card */}
-        {article.author?.bio && (
+        {/* Author Bio Card - only for editorial articles with author bio */}
+        {!isCommunitySubmission && article.author?.bio && (
           <div className="bg-[#FFFDF9] rounded-2xl p-8 border border-agora-border shadow-sm mb-16 flex flex-col sm:flex-row gap-6 items-center sm:items-start text-center sm:text-left">
             {authorAvatar ? (
               <div className="w-20 h-20 rounded-full overflow-hidden border-2 border-agora-accent shrink-0">
-                <img src={authorAvatar} alt={article.author.name} className="w-full h-full object-cover" />
+                <img src={authorAvatar} alt={displayName} className="w-full h-full object-cover" />
               </div>
             ) : (
               <div className="w-20 h-20 rounded-full bg-[#EAE3D5] text-agora-primary flex items-center justify-center font-serif font-bold text-2xl shrink-0">
-                {article.author?.name?.[0] || 'A'}
+                {displayName?.[0] || 'A'}
               </div>
             )}
             <div className="space-y-2">
-              <h3 className="font-serif text-xl font-bold text-agora-dark">About {article.author.name}</h3>
+              <h3 className="font-serif text-xl font-bold text-agora-dark">About {displayName}</h3>
               <p className="text-xs md:text-sm text-agora-muted leading-relaxed">{article.author.bio}</p>
               {article.author.website && (
                 <a

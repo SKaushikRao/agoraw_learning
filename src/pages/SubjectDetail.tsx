@@ -155,7 +155,21 @@ export default function SubjectDetail() {
           <div className="lg:col-span-8 space-y-8">
             
             {/* Header Banner Card */}
-            <div className={`relative overflow-hidden rounded-3xl ${themeClass.heroBg} p-8 md:p-12 shadow-lg text-white flex flex-col md:flex-row justify-between items-center gap-6`}>
+            <div className={`relative overflow-hidden rounded-3xl p-8 md:p-12 shadow-lg text-white flex flex-col md:flex-row justify-between items-center gap-6`}>
+              {/* Background Image or Gradient Fallback */}
+              {subject.bannerImage ? (
+                <>
+                  <img
+                    src={getSanityImageUrl(subject.bannerImage, { width: 1200, height: 600 })}
+                    alt={subject.title}
+                    className="absolute inset-0 w-full h-full object-cover"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/50 to-black/70"></div>
+                </>
+              ) : (
+                <div className={`absolute inset-0 ${themeClass.heroBg}`}></div>
+              )}
+              
               <div className="space-y-4 max-w-lg z-10">
                 <h1 className="font-serif text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight">
                   {subject.title}
@@ -189,13 +203,17 @@ export default function SubjectDetail() {
                 )}
               </div>
               
-              {/* Illustration Placeholder/Image */}
-              <div className="relative w-48 h-48 md:w-56 md:h-56 flex items-center justify-center bg-white/5 backdrop-blur-sm rounded-full border border-white/10 z-10 shrink-0">
-                {renderSubjectHeroIcon(subject.iconType)}
-              </div>
+              {/* Illustration Placeholder/Image - only show if no banner image */}
+              {!subject.bannerImage && (
+                <div className="relative w-48 h-48 md:w-56 md:h-56 flex items-center justify-center bg-white/5 backdrop-blur-sm rounded-full border border-white/10 z-10 shrink-0">
+                  {renderSubjectHeroIcon(subject.iconType)}
+                </div>
+              )}
               
-              {/* background graphic shapes */}
-              <div className="absolute right-0 top-0 w-80 h-80 bg-white/5 rounded-full blur-3xl -z-0"></div>
+              {/* background graphic shapes - only show if no banner image */}
+              {!subject.bannerImage && (
+                <div className="absolute right-0 top-0 w-80 h-80 bg-white/5 rounded-full blur-3xl -z-0"></div>
+              )}
             </div>
 
             {/* Guided Learning Path Steps Horizontal Bar */}
