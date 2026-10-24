@@ -102,13 +102,13 @@ export default function Articles() {
   // Filter subjects based on search query
   const matchingSubjects = queryParam
     ? subjects.filter((s) => {
-        const q = queryParam.toLowerCase();
-        const matchTitle = (s.title || '').toLowerCase().includes(q);
-        const matchSub = (s.subtitle || '').toLowerCase().includes(q);
-        const matchAbout = (s.aboutText || '').toLowerCase().includes(q);
-        const matchTopics = (s.topics || []).some((top: string) => top.toLowerCase().includes(q));
-        return matchTitle || matchSub || matchAbout || matchTopics;
-      })
+      const q = queryParam.toLowerCase();
+      const matchTitle = (s.title || '').toLowerCase().includes(q);
+      const matchSub = (s.subtitle || '').toLowerCase().includes(q);
+      const matchAbout = (s.aboutText || '').toLowerCase().includes(q);
+      const matchTopics = (s.topics || []).some((top: string) => top.toLowerCase().includes(q));
+      return matchTitle || matchSub || matchAbout || matchTopics;
+    })
     : [];
 
   if (loading) {
@@ -204,7 +204,7 @@ export default function Articles() {
 
       {filteredArticles.length > 0 ? (
         <>
-          <SubjectSection 
+          <SubjectSection
             stepNumber={1}
             title={isFiltering ? `Search Results (${filteredArticles.length})` : 'Featured Reading'}
             description={isFiltering ? 'Articles matching your criteria.' : "Curated selection of our best essays and materials."}
@@ -212,7 +212,7 @@ export default function Articles() {
           />
 
           {!isFiltering && recentList.length > 0 && (
-            <SubjectSection 
+            <SubjectSection
               stepNumber={2}
               title="Recent Publications"
               description="The latest additions to our educational catalogue."
@@ -223,7 +223,7 @@ export default function Articles() {
       ) : (
         <EmptyState
           title={isFiltering ? "No Matching Articles" : "No Articles Published"}
-          message={isFiltering ? `No articles matched your search query "${queryParam || tagParam}". Try clearing your filters or searching another keyword.` : "No articles are currently published in Sanity. Create and publish articles in the Admin Dashboard."}
+          message={isFiltering ? `No articles matched your search query "${queryParam || tagParam}". Try clearing your filters or searching another keyword.` : "No articles are currently published yet."}
           actionText={isFiltering ? "Clear Filters" : "Go to Homepage"}
           actionLink={isFiltering ? "/articles" : "/"}
         />

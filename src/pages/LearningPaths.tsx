@@ -41,7 +41,7 @@ export default function LearningPaths() {
       <p className="text-agora-muted mb-12 max-w-2xl">
         Structured journeys designed to guide you through complex topics step-by-step.
       </p>
-      
+
       {paths.length > 0 ? (
         paths.map((path) => {
           const steps = (path.steps || []).map((step, idx) => ({
@@ -88,7 +88,7 @@ export default function LearningPaths() {
       ) : (
         <EmptyState
           title="No Learning Paths Published"
-          message="Structured learning paths will appear here once published from the Admin Dashboard."
+          message="Structured learning paths will appear here once published"
           actionText="Explore Subjects"
           actionLink="/subjects"
         />
