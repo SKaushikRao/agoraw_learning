@@ -143,7 +143,7 @@ export default function WriteArticleModal({ isOpen, onClose, onSubmitSuccess }: 
                     type="text"
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
-                    placeholder="Your essay title"
+                    placeholder="Your Title"
                     className="w-full px-4 py-3 border border-agora-border rounded-lg focus:outline-none focus:ring-2 focus:ring-agora-accent/30 font-serif text-lg"
                   />
                 </div>

@@ -137,6 +137,10 @@ export interface SanitySubject {
     articles?: string;
     videos?: string;
   };
+  articlesCount?: number;
+  resourcesCount?: number;
+  videosCount?: number;
+  learningPathsCount?: number;
   topics?: string[];
   learningSteps?: SanityLearningStep[];
   recommended?: (SanityArticle | SanityResource)[];

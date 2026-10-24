@@ -153,8 +153,8 @@ export default function Community() {
       
       <div className="bg-agora-card border border-agora-border rounded-2xl overflow-hidden shadow-sm relative mb-16">
         <div className="absolute top-6 left-6 z-10 bg-agora-bg/80 backdrop-blur-md p-4 rounded-xl border border-agora-border">
-          <div className="text-3xl font-serif font-bold text-agora-dark">4,285</div>
-          <div className="text-[10px] uppercase tracking-widest text-agora-accent font-bold">Active Thinkers Online</div>
+          <div className="text-xl font-serif font-bold text-agora-dark">Welcome to our community</div>
+          <div className="text-[10px] uppercase tracking-widest text-agora-accent font-bold">An Evergrowing Space for Thinkers</div>
         </div>
         <canvas ref={canvasRef} className="w-full h-[400px] bg-[#F8F4EE]" style={{ display: 'block' }}></canvas>
       </div>
@@ -256,7 +256,7 @@ export default function Community() {
           </div>
         ) : (
           <div className="text-center py-16 border border-dashed border-agora-border rounded-2xl">
-            <p className="text-agora-muted">No community essays yet. Be the first to share your perspective!</p>
+            <p className="text-agora-muted">No community Essays yet. Be the first to share your perspective!</p>
             <button
               onClick={() => setIsWriteModalOpen(true)}
               className="mt-4 bg-agora-primary text-agora-bg px-6 py-2.5 rounded-full text-xs font-medium hover:bg-agora-dark transition-colors"

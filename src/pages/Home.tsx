@@ -24,7 +24,8 @@ function getSubjectIcon(iconType?: string) {
 }
 
 export default function Home() {
-  const [selectedDate, setSelectedDate] = useState<number>(11);
+  const [currentDate, setCurrentDate] = useState(() => new Date()); // Use actual current date
+  const [selectedDate, setSelectedDate] = useState<number>(new Date().getDate());
   const [loading, setLoading] = useState(true);
   const [homeData, setHomeData] = useState<any>(null);
   const [isWriteModalOpen, setIsWriteModalOpen] = useState(false);
@@ -98,13 +99,33 @@ export default function Home() {
       ? settings.upcomingEvents
       : homeData?.fallbackEvents || [];
 
-  const calendarDays = [
-    { date: null, label: '' }, { date: null, label: '' }, { date: null, label: '' }, { date: 1, label: 'Wed' }, { date: 2, label: 'Thu' }, { date: 3, label: 'Fri' }, { date: 4, label: 'Sat' },
-    { date: 5, label: 'Sun' }, { date: 6, label: 'Mon' }, { date: 7, label: 'Tue' }, { date: 8, label: 'Wed' }, { date: 9, label: 'Thu' }, { date: 10, label: 'Fri' }, { date: 11, label: 'Sat' },
-    { date: 12, label: 'Sun' }, { date: 13, label: 'Mon' }, { date: 14, label: 'Tue' }, { date: 15, label: 'Wed' }, { date: 16, label: 'Thu' }, { date: 17, label: 'Fri' }, { date: 18, label: 'Sat' },
-    { date: 19, label: 'Sun' }, { date: 20, label: 'Mon' }, { date: 21, label: 'Tue' }, { date: 22, label: 'Wed' }, { date: 23, label: 'Thu' }, { date: 24, label: 'Fri' }, { date: 25, label: 'Sat' },
-    { date: 26, label: 'Sun' }, { date: 27, label: 'Mon' }, { date: 28, label: 'Tue' }, { date: 29, label: 'Wed' }, { date: 30, label: 'Thu' }, { date: 31, label: 'Fri' }
+  const year = currentDate.getFullYear();
+  const month = currentDate.getMonth();
+  const monthNames = [
+    'January', 'February', 'March', 'April', 'May', 'June',
+    'July', 'August', 'September', 'October', 'November', 'December'
   ];
+  const monthLabel = `${monthNames[month]} ${year}`;
+
+  const nextMonth = () => {
+    setCurrentDate(new Date(year, month + 1, 1));
+  };
+
+  const prevMonth = () => {
+    setCurrentDate(new Date(year, month - 1, 1));
+  };
+
+  // Dynamic calendar grid
+  const firstDayIndex = (new Date(year, month, 1).getDay() + 6) % 7; // Monday = 0
+  const totalDaysInMonth = new Date(year, month + 1, 0).getDate();
+
+  const calendarDays: { date: number | null }[] = [];
+  for (let i = 0; i < firstDayIndex; i++) {
+    calendarDays.push({ date: null });
+  }
+  for (let d = 1; d <= totalDaysInMonth; d++) {
+    calendarDays.push({ date: d });
+  }
 
   const heroImageUrl = getSanityImageUrl(settings?.heroImage, { width: 800, height: 1000 });
   const aboutImageUrl =
@@ -161,25 +182,60 @@ export default function Home() {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {subjects.map((sub: any) => {
                 const subSlug = sub.slug?.current || sub._id;
+                const stats = {
+                  paths: sub.learningPathsCount ?? 0,
+                  resources: sub.resourcesCount ?? 0,
+                  articles: sub.articlesCount ?? 0,
+                  videos: sub.videosCount ?? 0
+                };
+                const bannerImageUrl = getSanityImageUrl(sub.bannerImage, { width: 400, height: 300 });
                 return (
                   <Link 
                     key={sub._id || subSlug} 
                     to={`/subject/${subSlug}`}
-                    className="bg-[#FFFDF9] hover:bg-[#FDF9F2] p-8 rounded-2xl border border-agora-border shadow-sm hover:shadow-md transition-all duration-300 group flex flex-col justify-between h-64 text-left"
+                    className="relative bg-[#FFFDF9] hover:bg-[#FDF9F2] rounded-2xl border border-agora-border shadow-sm hover:shadow-md transition-all duration-300 group flex flex-col justify-between h-80 text-left overflow-hidden"
                   >
-                    <div className="space-y-4">
+                    {/* Backdrop Image */}
+                    {bannerImageUrl && (
+                      <>
+                        <img
+                          src={bannerImageUrl}
+                          alt={sub.title}
+                          className="absolute inset-0 w-full h-full object-cover opacity-20 group-hover:opacity-25 transition-opacity"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#FFFDF9]/70 to-[#FFFDF9]"></div>
+                      </>
+                    )}
+                    <div className="relative z-10 space-y-4">
                       <div className="p-3 bg-[#F5EFE4] w-fit rounded-xl group-hover:scale-105 transition-transform">
                         {getSubjectIcon(sub.iconType)}
                       </div>
                       <h3 className="font-serif text-2xl font-bold text-agora-dark group-hover:text-[#5C3B22] transition-colors">
                         {sub.title || sub.name}
                       </h3>
-                      <p className="text-xs text-agora-muted leading-relaxed line-clamp-3">
+                      <p className="text-xs text-agora-muted leading-relaxed line-clamp-2">
                         {sub.subtitle || sub.aboutText || sub.description}
                       </p>
                     </div>
-                    <div className="flex justify-end pt-4">
-                      <ArrowRight size={18} className="text-agora-accent group-hover:translate-x-1.5 transition-transform" />
+                    <div className="relative z-10 space-y-2 pt-4 border-t border-agora-border bg-[#FFFDF9]/80 backdrop-blur-sm">
+                      <div className="grid grid-cols-2 gap-2 text-center">
+                        <div>
+                          <div className="font-serif text-lg font-bold text-agora-dark">{stats.paths}</div>
+                          <div className="text-[9px] uppercase tracking-wider text-agora-muted">Guided Paths</div>
+                        </div>
+                        <div>
+                          <div className="font-serif text-lg font-bold text-agora-dark">{stats.resources}</div>
+                          <div className="text-[9px] uppercase tracking-wider text-agora-muted">Resources</div>
+                        </div>
+                        <div>
+                          <div className="font-serif text-lg font-bold text-agora-dark">{stats.articles}</div>
+                          <div className="text-[9px] uppercase tracking-wider text-agora-muted">Articles</div>
+                        </div>
+                        <div>
+                          <div className="font-serif text-lg font-bold text-agora-dark">{stats.videos}</div>
+                          <div className="text-[9px] uppercase tracking-wider text-agora-muted">Videos</div>
+                        </div>
+                      </div>
                     </div>
                   </Link>
                 );
@@ -316,7 +372,7 @@ export default function Home() {
             </div>
           ) : (
             <div className="bg-[#FFFDF9] p-8 rounded-2xl border border-agora-border text-center text-agora-muted text-sm">
-              No articles have been published yet. Articles created and published in Sanity Studio will appear here.
+              No articles have been published yet
             </div>
           )}
         </div>
@@ -431,11 +487,26 @@ export default function Home() {
           {/* Calendar Card */}
           <div className="bg-[#FFFDF9] rounded-3xl p-6 border border-agora-border shadow-sm space-y-4">
             <div className="flex items-center justify-between">
-              <h3 className="font-serif text-xl font-bold text-agora-dark">Calendar</h3>
+              <div>
+                <h3 className="font-serif text-xl font-bold text-agora-dark">Calendar</h3>
+                <p className="text-[10px] text-agora-muted">Select a date to view events</p>
+              </div>
               <div className="flex items-center gap-2">
-                <button className="p-1 hover:bg-[#F5EFE4] rounded-full transition-colors"><ChevronLeft size={16} /></button>
-                <span className="text-xs font-semibold uppercase tracking-wider">May 2026</span>
-                <button className="p-1 hover:bg-[#F5EFE4] rounded-full transition-colors"><ChevronRight size={16} /></button>
+                <button 
+                  onClick={prevMonth}
+                  className="p-1 hover:bg-[#F5EFE4] rounded-full transition-colors cursor-pointer"
+                  title="Previous month"
+                >
+                  <ChevronLeft size={16} />
+                </button>
+                <span className="text-xs font-semibold uppercase tracking-wider">{monthLabel}</span>
+                <button 
+                  onClick={nextMonth}
+                  className="p-1 hover:bg-[#F5EFE4] rounded-full transition-colors cursor-pointer"
+                  title="Next month"
+                >
+                  <ChevronRight size={16} />
+                </button>
               </div>
             </div>
 
@@ -446,53 +517,85 @@ export default function Home() {
                   {day}
                 </div>
               ))}
-              {calendarDays.map((cell, idx) => (
-                <div key={idx} className="flex justify-center items-center h-8">
-                  {cell.date ? (
+              {calendarDays.map((cell, idx) => {
+                if (!cell.date) {
+                  return <div key={idx} className="h-8"></div>;
+                }
+                const hasEvent = events.some((e: any) => {
+                  const eventDate = e.eventDate ? new Date(e.eventDate) : null;
+                  const eventDay = eventDate?.getDate();
+                  const eventMonth = eventDate?.getMonth();
+                  return eventDay === cell.date && eventMonth === month;
+                });
+                const isSelected = selectedDate === cell.date;
+
+                return (
+                  <div key={idx} className="flex justify-center items-center h-8 relative">
                     <button 
                       onClick={() => setSelectedDate(cell.date!)}
-                      className={`w-7 h-7 rounded-full text-xs font-semibold transition-all flex items-center justify-center 
-                        ${selectedDate === cell.date 
+                      className={`w-7 h-7 rounded-full text-xs font-semibold transition-all flex items-center justify-center relative cursor-pointer
+                        ${isSelected 
                           ? 'bg-[#3A2415] text-white scale-110 shadow-sm' 
                           : 'text-agora-dark hover:bg-[#F5EFE4]'}`}
                     >
                       {cell.date}
+                      {hasEvent && !isSelected && (
+                        <span className="absolute -bottom-0.5 w-1 h-1 rounded-full bg-[#B78B4A]"></span>
+                      )}
                     </button>
-                  ) : null}
-                </div>
-              ))}
+                  </div>
+                );
+              })}
             </div>
           </div>
 
           {/* Upcoming Events Card */}
           <div className="bg-[#FFFDF9] rounded-3xl p-6 border border-agora-border shadow-sm space-y-6">
-            <h3 className="font-serif text-xl font-bold text-agora-dark border-b pb-3 border-slate-100">Upcoming Events</h3>
+            <div className="flex items-center justify-between border-b pb-3 border-slate-100">
+              <h3 className="font-serif text-xl font-bold text-agora-dark">Upcoming Events</h3>
+              {selectedDate && (
+                <span className="text-[10px] bg-[#F5EFE4] text-agora-primary font-semibold px-2 py-0.5 rounded-full">
+                  Selected: Day {selectedDate}
+                </span>
+              )}
+            </div>
             {events.length > 0 ? (
               <div className="relative pl-6 border-l-2 border-[#E6DDD2] space-y-6">
-                {events.map((evt: any, idx: number) => (
-                  <div key={evt._id || idx} className="relative group">
-                    {/* Timeline point */}
-                    <div className="absolute -left-[31px] top-1 w-2.5 h-2.5 rounded-full bg-[#B78B4A] border-2 border-white group-hover:scale-125 transition-transform"></div>
-                    
-                    <div className="flex gap-4">
-                      <div className="text-center w-10 shrink-0">
-                        <div className="font-serif text-xl font-bold text-agora-dark leading-none">{evt.dateDay || '24'}</div>
-                        <div className="text-[9px] uppercase tracking-wider text-agora-accent font-semibold">{evt.dateMonth || 'MAY'}</div>
-                      </div>
-                      <div>
-                        <span className="text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-slate-100 text-slate-500 mb-1 inline-block">
-                          {evt.category || 'Lecture'}
-                        </span>
-                        <h4 className="font-serif text-sm font-bold text-agora-dark leading-snug group-hover:text-[#5C3B22] transition-colors">
-                          {evt.title}
-                        </h4>
-                        <p className="text-[10px] text-slate-400 mt-1 flex items-center gap-1">
-                          <Clock size={10} /> {evt.time || '11:00 AM (EST)'}
-                        </p>
+                {events.map((evt: any, idx: number) => {
+                  const eventDate = evt.eventDate ? new Date(evt.eventDate) : null;
+                  const eventDay = eventDate?.getDate();
+                  const eventMonth = eventDate?.getMonth();
+                  const isMatchingDate = selectedDate && eventDay === selectedDate && eventMonth === month;
+                  const isSelectedMonth = eventMonth === month;
+
+                  return (
+                    <div 
+                      key={evt._id || idx} 
+                      className={`relative group transition-all p-2 rounded-xl ${isMatchingDate ? 'bg-[#FBF6ED] ring-1 ring-[#B78B4A]/50 -ml-2 pl-4' : !isSelectedMonth ? 'opacity-40' : ''}`}
+                    >
+                      {/* Timeline point */}
+                      <div className={`absolute top-3 w-2.5 h-2.5 rounded-full border-2 border-white transition-transform ${isMatchingDate ? '-left-[27px] bg-[#3A2415] scale-150' : '-left-[31px] bg-[#B78B4A] group-hover:scale-125'}`}></div>
+                      
+                      <div className="flex gap-4">
+                        <div className="text-center w-10 shrink-0">
+                          <div className={`font-serif text-xl font-bold leading-none ${isMatchingDate ? 'text-[#B78B4A]' : 'text-agora-dark'}`}>{eventDay || evt.dateDay || '24'}</div>
+                          <div className="text-[9px] uppercase tracking-wider text-agora-accent font-semibold">{eventMonth !== undefined ? monthNames[eventMonth] : (evt.dateMonth || 'MAY')}</div>
+                        </div>
+                        <div>
+                          <span className="text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-slate-100 text-slate-500 mb-1 inline-block">
+                            {evt.category || 'Lecture'}
+                          </span>
+                          <h4 className="font-serif text-sm font-bold text-agora-dark leading-snug group-hover:text-[#5C3B22] transition-colors">
+                            {evt.title}
+                          </h4>
+                          <p className="text-[10px] text-slate-400 mt-1 flex items-center gap-1">
+                            <Clock size={10} /> {evt.time || eventDate?.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) || '11:00 AM (EST)'}
+                          </p>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             ) : (
               <p className="text-xs text-agora-muted italic">No upcoming events scheduled at this moment.</p>

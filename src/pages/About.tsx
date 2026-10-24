@@ -24,17 +24,12 @@ export default function About() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16">
         <div className="bg-agora-bg border border-agora-border p-8 rounded-xl shadow-sm">
           <h3 className="font-serif text-xl text-agora-dark mb-3">Interdisciplinary Approach</h3>
-          <p className="text-sm text-agora-muted">We believe that the most profound insights happen at the intersection of disciplines. Our learning paths connect seemingly disparate fields to reveal the unified tapestry of human knowledge.</p>
+          <p className="text-sm text-agora-muted">We believe that the most profound insights happen at the intersection of disciplines. Our learning paths connect diverse fields to reveal the unified tapestry of human knowledge.</p>
         </div>
         <div className="bg-agora-bg border border-agora-border p-8 rounded-xl shadow-sm">
           <h3 className="font-serif text-xl text-agora-dark mb-3">Community-Driven</h3>
           <p className="text-sm text-agora-muted">Learning is not a solitary endeavor. Agora thrives on the diverse perspectives of its members, from seasoned academics to enthusiastic beginners.</p>
         </div>
-      </div>
-      
-      <div className="text-center">
-        <h2 className="font-serif text-3xl text-agora-dark mb-6">Join the Conversation</h2>
-        <button className="bg-agora-primary text-agora-bg px-8 py-3 rounded-full text-sm font-medium hover:bg-agora-dark transition-colors">Register Today</button>
       </div>
     </div>
   );

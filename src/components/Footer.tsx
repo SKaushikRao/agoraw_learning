@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 export default function Footer() {
   return (
     <footer className="bg-agora-bg text-agora-dark border-t border-agora-border py-16 px-6 md:px-12 mt-24">
-      <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-12">
+      <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-12">
         <div className="col-span-1 md:col-span-1">
           <div className="flex items-center gap-2 mb-6">
             <span className="font-serif text-2xl font-bold tracking-tight text-agora-primary">Agora</span>
@@ -37,21 +37,6 @@ export default function Footer() {
             <li><Link to="/about" className="hover:text-agora-primary transition-colors">Upcoming Events</Link></li>
             <li><Link to="/about" className="hover:text-agora-primary transition-colors">Guidelines</Link></li>
           </ul>
-        </div>
-
-        <div>
-          <h4 className="text-[10px] uppercase tracking-widest font-bold text-agora-accent mb-6">Stay Inspired</h4>
-          <p className="text-agora-muted text-[11px] mb-4">Get updates on new resources, articles, and events.</p>
-          <div className="flex">
-            <input 
-              type="email" 
-              placeholder="Enter your email" 
-              className="bg-agora-card border border-agora-border text-agora-dark px-4 py-2 rounded-l-md focus:outline-none focus:border-agora-accent w-full text-xs"
-            />
-            <button className="bg-agora-primary text-agora-bg px-4 py-2 rounded-r-md font-medium text-xs hover:bg-agora-dark transition-colors">
-              Subscribe
-            </button>
-          </div>
         </div>
       </div>
       

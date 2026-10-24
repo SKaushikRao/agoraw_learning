@@ -31,6 +31,94 @@ function getThemeStyles(colorTheme?: string) {
     };
   }
 
+  if (colorTheme === 'golden-ochre') {
+    return {
+      bg: 'bg-[#FAF6EF]',
+      cardBg: 'bg-white',
+      border: 'border-[#EADCC8]',
+      textDark: 'text-[#3B2C14]',
+      textMuted: 'text-[#7D6B4E]',
+      primary: 'bg-[#B78B4A]',
+      primaryText: 'text-[#B78B4A]',
+      primaryBorder: 'border-[#B78B4A]',
+      accent: 'text-[#8C642A]',
+      accentBg: 'bg-[#B78B4A]/10',
+      heroBg: 'bg-gradient-to-r from-[#8C642A] via-[#B78B4A] to-[#8C642A]',
+      heroText: 'text-white',
+      heroMuted: 'text-[#F5EAD4]',
+      badgeBg: 'bg-[#FAF0DE]',
+      badgeText: 'text-[#8C642A]',
+      hoverBg: 'hover:bg-[#B78B4A]/5',
+      buttonHover: 'hover:bg-[#72501E]',
+    };
+  }
+
+  if (colorTheme === 'emerald-sage') {
+    return {
+      bg: 'bg-[#F1F6F3]',
+      cardBg: 'bg-white',
+      border: 'border-[#D1E0D7]',
+      textDark: 'text-[#193325]',
+      textMuted: 'text-[#527060]',
+      primary: 'bg-[#2E5E43]',
+      primaryText: 'text-[#2E5E43]',
+      primaryBorder: 'border-[#2E5E43]',
+      accent: 'text-[#22724A]',
+      accentBg: 'bg-[#2E5E43]/10',
+      heroBg: 'bg-gradient-to-r from-[#193B27] via-[#2E5E43] to-[#193B27]',
+      heroText: 'text-white',
+      heroMuted: 'text-[#D0E5D7]',
+      badgeBg: 'bg-[#E2EFE7]',
+      badgeText: 'text-[#193B27]',
+      hoverBg: 'hover:bg-[#2E5E43]/5',
+      buttonHover: 'hover:bg-[#193B27]',
+    };
+  }
+
+  if (colorTheme === 'terracotta') {
+    return {
+      bg: 'bg-[#FAF3F0]',
+      cardBg: 'bg-white',
+      border: 'border-[#EAD6CF]',
+      textDark: 'text-[#3E1F18]',
+      textMuted: 'text-[#7A554D]',
+      primary: 'bg-[#9E4734]',
+      primaryText: 'text-[#9E4734]',
+      primaryBorder: 'border-[#9E4734]',
+      accent: 'text-[#C05D47]',
+      accentBg: 'bg-[#9E4734]/10',
+      heroBg: 'bg-gradient-to-r from-[#692415] via-[#9E4734] to-[#692415]',
+      heroText: 'text-white',
+      heroMuted: 'text-[#F2D6CE]',
+      badgeBg: 'bg-[#F9E6E1]',
+      badgeText: 'text-[#692415]',
+      hoverBg: 'hover:bg-[#9E4734]/5',
+      buttonHover: 'hover:bg-[#692415]',
+    };
+  }
+
+  if (colorTheme === 'burgundy-wine') {
+    return {
+      bg: 'bg-[#F8F1F3]',
+      cardBg: 'bg-white',
+      border: 'border-[#E4D1D6]',
+      textDark: 'text-[#32131C]',
+      textMuted: 'text-[#724A56]',
+      primary: 'bg-[#621D34]',
+      primaryText: 'text-[#621D34]',
+      primaryBorder: 'border-[#621D34]',
+      accent: 'text-[#8E2F50]',
+      accentBg: 'bg-[#621D34]/10',
+      heroBg: 'bg-gradient-to-r from-[#421021] via-[#621D34] to-[#421021]',
+      heroText: 'text-white',
+      heroMuted: 'text-[#E8CDD5]',
+      badgeBg: 'bg-[#F4E1E7]',
+      badgeText: 'text-[#421021]',
+      hoverBg: 'hover:bg-[#621D34]/5',
+      buttonHover: 'hover:bg-[#421021]',
+    };
+  }
+
   // Default: Space Cadet theme
   return {
     bg: 'bg-[#F2F5FA]',
@@ -164,7 +252,8 @@ export default function SubjectDetail() {
                     alt={subject.title}
                     className="absolute inset-0 w-full h-full object-cover"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/50 to-black/70"></div>
+                  <div className={`absolute inset-0 ${themeClass.heroBg} opacity-85`}></div>
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-black/20"></div>
                 </>
               ) : (
                 <div className={`absolute inset-0 ${themeClass.heroBg}`}></div>
@@ -181,26 +270,24 @@ export default function SubjectDetail() {
                 )}
                 
                 {/* Stats Panel */}
-                {subject.stats && (
-                  <div className="grid grid-cols-4 gap-4 pt-6 border-t border-white/10 mt-6">
-                    <div>
-                      <div className="text-xl md:text-2xl font-serif font-bold">{subject.stats.paths || `${steps.length}`}</div>
-                      <div className="text-[9px] uppercase tracking-widest text-white/70">Guided Paths</div>
-                    </div>
-                    <div>
-                      <div className="text-xl md:text-2xl font-serif font-bold">{subject.stats.resources || '10+'}</div>
-                      <div className="text-[9px] uppercase tracking-widest text-white/70">Resources</div>
-                    </div>
-                    <div>
-                      <div className="text-xl md:text-2xl font-serif font-bold">{subject.stats.articles || '10+'}</div>
-                      <div className="text-[9px] uppercase tracking-widest text-white/70">Articles</div>
-                    </div>
-                    <div>
-                      <div className="text-xl md:text-2xl font-serif font-bold">{subject.stats.videos || '5+'}</div>
-                      <div className="text-[9px] uppercase tracking-widest text-white/70">Videos</div>
-                    </div>
+                <div className="grid grid-cols-4 gap-4 pt-6 border-t border-white/10 mt-6">
+                  <div>
+                    <div className="text-xl md:text-2xl font-serif font-bold">{subject.learningPathsCount ?? 0}</div>
+                    <div className="text-[9px] uppercase tracking-widest text-white/70">Guided Paths</div>
                   </div>
-                )}
+                  <div>
+                    <div className="text-xl md:text-2xl font-serif font-bold">{subject.resourcesCount ?? 0}</div>
+                    <div className="text-[9px] uppercase tracking-widest text-white/70">Resources</div>
+                  </div>
+                  <div>
+                    <div className="text-xl md:text-2xl font-serif font-bold">{subject.articlesCount ?? 0}</div>
+                    <div className="text-[9px] uppercase tracking-widest text-white/70">Articles</div>
+                  </div>
+                  <div>
+                    <div className="text-xl md:text-2xl font-serif font-bold">{subject.videosCount ?? 0}</div>
+                    <div className="text-[9px] uppercase tracking-widest text-white/70">Videos</div>
+                  </div>
+                </div>
               </div>
               
               {/* Illustration Placeholder/Image - only show if no banner image */}

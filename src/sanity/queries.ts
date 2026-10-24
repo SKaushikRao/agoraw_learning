@@ -163,7 +163,11 @@ export const GET_HOMEPAGE_QUERY = `
       colorTheme,
       bannerImage {
         ${IMAGE_FRAGMENT}
-      }
+      },
+      "articlesCount": count(*[_type == "article" && status == "approved" && subject._ref == ^._id]),
+      "resourcesCount": count(*[_type == "resource" && isVisible != false && subject._ref == ^._id]),
+      "videosCount": count(*[_type == "article" && status == "approved" && type == "video" && subject._ref == ^._id]),
+      "learningPathsCount": count(*[_type == "learningPath" && isVisible != false && subject._ref == ^._id])
     },
     featuredArticles[]->{
       ${ARTICLE_CARD_FRAGMENT}
@@ -188,12 +192,16 @@ export const GET_HOMEPAGE_QUERY = `
     colorTheme,
     bannerImage {
       ${IMAGE_FRAGMENT}
-    }
+    },
+    "articlesCount": count(*[_type == "article" && status == "approved" && subject._ref == ^._id]),
+    "resourcesCount": count(*[_type == "resource" && isVisible != false && subject._ref == ^._id]),
+    "videosCount": count(*[_type == "article" && status == "approved" && type == "video" && subject._ref == ^._id]),
+    "learningPathsCount": count(*[_type == "learningPath" && isVisible != false && subject._ref == ^._id])
   },
   "fallbackArticles": *[_type == "article" && status == "approved"] | order(order asc, publishedAt desc)[0...5]{
     ${ARTICLE_CARD_FRAGMENT}
   },
-  "fallbackEvents": *[_type == "event" && isVisible != false] | order(order asc)[0...5]{
+  "fallbackEvents": *[_type == "event" && isVisible != false && eventDate >= now()] | order(eventDate asc)[0...5]{
     ${EVENT_FRAGMENT}
   }
 }
@@ -213,7 +221,11 @@ export const GET_SUBJECTS_QUERY = `
   stats,
   bannerImage {
     ${IMAGE_FRAGMENT}
-  }
+  },
+  "articlesCount": count(*[_type == "article" && status == "approved" && subject._ref == ^._id]),
+  "resourcesCount": count(*[_type == "resource" && isVisible != false && subject._ref == ^._id]),
+  "videosCount": count(*[_type == "article" && status == "approved" && type == "video" && subject._ref == ^._id]),
+  "learningPathsCount": count(*[_type == "learningPath" && isVisible != false && subject._ref == ^._id])
 }
 `;
 
@@ -231,6 +243,10 @@ export const GET_SUBJECT_BY_SLUG_QUERY = `
   bannerImage {
     ${IMAGE_FRAGMENT}
   },
+  "articlesCount": count(*[_type == "article" && status == "approved" && subject._ref == ^._id]),
+  "resourcesCount": count(*[_type == "resource" && isVisible != false && subject._ref == ^._id]),
+  "videosCount": count(*[_type == "article" && status == "approved" && type == "video" && subject._ref == ^._id]),
+  "learningPathsCount": count(*[_type == "learningPath" && isVisible != false && subject._ref == ^._id]),
   quote {
     text,
     author,
@@ -461,7 +477,7 @@ export const GET_RESOURCES_QUERY = `
 `;
 
 export const GET_EVENTS_QUERY = `
-*[_type == "event" && isVisible != false] | order(order asc) {
+*[_type == "event" && isVisible != false && eventDate >= now()] | order(eventDate asc) {
   ${EVENT_FRAGMENT}
 }
 `;

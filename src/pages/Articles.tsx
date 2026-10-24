@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, Link } from 'react-router-dom';
 import SubjectSection from '../components/SubjectSection';
 import { sanityFetch } from '../sanity/client';
-import { GET_ARTICLES_QUERY } from '../sanity/queries';
-import { SanityArticle, Article } from '../types';
+import { GET_ARTICLES_QUERY, GET_SUBJECTS_QUERY } from '../sanity/queries';
+import { SanityArticle, Article, SanitySubject } from '../types';
 import { getSanityImageUrl } from '../sanity/image';
 import EmptyState from '../components/EmptyState';
 import { PageLoading } from '../components/LoadingSkeleton';
-import { Search, Tag as TagIcon, X } from 'lucide-react';
+import { Search, Tag as TagIcon, X, BookOpen, ArrowRight } from 'lucide-react';
 
 function mapSanityArticleToArticle(a: SanityArticle): Article {
   return {
@@ -30,17 +30,22 @@ export default function Articles() {
   const tagParam = searchParams.get('tag') || '';
   const [searchTerm, setSearchTerm] = useState(queryParam);
   const [articles, setArticles] = useState<Article[]>([]);
+  const [subjects, setSubjects] = useState<SanitySubject[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     let isMounted = true;
     setLoading(true);
 
-    sanityFetch<SanityArticle[]>(GET_ARTICLES_QUERY)
-      .then((data) => {
+    Promise.all([
+      sanityFetch<SanityArticle[]>(GET_ARTICLES_QUERY),
+      sanityFetch<SanitySubject[]>(GET_SUBJECTS_QUERY),
+    ])
+      .then(([articlesData, subjectsData]) => {
         if (isMounted) {
-          const mapped = (data || []).map(mapSanityArticleToArticle);
+          const mapped = (articlesData || []).map(mapSanityArticleToArticle);
           setArticles(mapped);
+          setSubjects(subjectsData || []);
           setLoading(false);
         }
       })
@@ -94,6 +99,18 @@ export default function Articles() {
     return true;
   });
 
+  // Filter subjects based on search query
+  const matchingSubjects = queryParam
+    ? subjects.filter((s) => {
+        const q = queryParam.toLowerCase();
+        const matchTitle = (s.title || '').toLowerCase().includes(q);
+        const matchSub = (s.subtitle || '').toLowerCase().includes(q);
+        const matchAbout = (s.aboutText || '').toLowerCase().includes(q);
+        const matchTopics = (s.topics || []).some((top: string) => top.toLowerCase().includes(q));
+        return matchTitle || matchSub || matchAbout || matchTopics;
+      })
+    : [];
+
   if (loading) {
     return <PageLoading />;
   }
@@ -137,6 +154,51 @@ export default function Articles() {
           <button onClick={clearFilters} className="ml-2 text-agora-muted hover:text-agora-dark font-semibold flex items-center gap-0.5">
             <X size={14} /> Clear
           </button>
+        </div>
+      )}
+
+      {/* Matching Subjects Section if searched query matches subjects */}
+      {queryParam && matchingSubjects.length > 0 && (
+        <div className="mb-12 bg-gradient-to-r from-[#FFF8EE] to-[#FFFDF9] p-6 md:p-8 rounded-2xl border border-agora-border shadow-sm">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2">
+              <BookOpen className="w-5 h-5 text-agora-primary" />
+              <h2 className="font-serif text-xl md:text-2xl font-bold text-agora-dark">
+                Matching Subject{matchingSubjects.length > 1 ? 's' : ''}
+              </h2>
+            </div>
+            <Link to="/subjects" className="text-xs font-semibold uppercase tracking-wider text-agora-primary hover:underline flex items-center gap-1">
+              View All Subjects <ArrowRight size={14} />
+            </Link>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {matchingSubjects.map((sub: any) => {
+              const subSlug = sub.slug?.current || sub._id;
+              return (
+                <Link
+                  key={sub._id}
+                  to={`/subject/${subSlug}`}
+                  className="bg-white hover:bg-[#FDFBF7] p-5 rounded-xl border border-agora-border shadow-sm hover:shadow-md transition-all group flex flex-col justify-between"
+                >
+                  <div>
+                    <span className="text-[9px] uppercase tracking-wider font-bold text-agora-accent mb-1 block">
+                      Discipline / Subject
+                    </span>
+                    <h3 className="font-serif text-xl font-bold text-agora-dark group-hover:text-agora-primary transition-colors">
+                      {sub.title}
+                    </h3>
+                    <p className="text-xs text-agora-muted line-clamp-2 mt-2 leading-relaxed">
+                      {sub.subtitle || sub.aboutText || 'Explore structured learning paths and resources.'}
+                    </p>
+                  </div>
+                  <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-semibold text-[#B78B4A]">
+                    <span>Explore Discipline</span>
+                    <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
+                  </div>
+                </Link>
+              );
+            })}
+          </div>
         </div>
       )}
 
